@@ -26,27 +26,12 @@ def lowercase(letters):
     for j in range(0,len(letters)):
         lower_letters+=letters[j].lower()
     return ''.join(lower_letters)
-#Cette fonction compare le mot deviné par l'utilisateur avec le mot secret.
-def _is_word_guessed(secret_word, letters_guessed):
-    counter=0
-    lower_letters=lowercase(letters_guessed)
-    for index1 in range(len(secret_word)):
-        for index2 in range(len(letters_guessed)):
-            if secret_word[index1]==letters_guessed[index2]:
-                counter+=1
-    if counter==len(secret_word):
-        return True
-    else:
-        return False
-"""else:
-return False
-return counter==len(secret_word)"""
 
 #A chaque fois que l'utilisateur trouve une lettre du mot secret, cette fonction affiche un mot comportant
 # les lettres déjà devinés par le joueur et celles qui n'ont pas encore été devinées.    
 def get_guessed_word(secret_word, letters_guessed, guess_word):
     guess_word=list(guess_word)
-    lower_letters=lowercase(letters_guessed)
+    lower_letters=letters_guessed.lower()
     for index1 in range(0,len(letters_guessed)):
         for index2 in range(0,len(secret_word)):
             if lower_letters[index1]==secret_word[index2]: 
@@ -60,6 +45,7 @@ def check_letter(word,letter):    #cette fonction verifie si une lettre est dans
              bool=False
              break
     return bool
+    """return letter in word"""
 
 
 
@@ -68,7 +54,7 @@ def check_letter(word,letter):    #cette fonction verifie si une lettre est dans
 
 def get_available_letters(available_letters,letter_guessed):
     list_letters=list(available_letters)
-    lower_letter=lowercase(letter_guessed)
+    lower_letter=letter_guessed.lower()
     for char in list_letters:
         if char == letter_guessed:
             list_letters.remove(char)
@@ -89,21 +75,22 @@ def match_with_gaps(my_word, other_word):
     other_word=list(other_word)
     my_word = list(my_word)
     for i in range(len(my_word)):
-        if my_word_copy[i].isalpha()==True and my_word_copy[i]==other_word[i]:
+        if my_word_copy[i].isalpha() and my_word_copy[i]==other_word[i]:
             counter+=1
     for char in my_word_copy:
         if char=='_':
             my_word.remove(char)
-    if counter == len(my_word):
-        return True
-    else:
-        return False
+    return counter == len(my_word) #si la longueur du mot
 #Cette fonction affiche tous les mots qui matchent avec les lettres déjà trouvé par l'utilisateur    
 def show_possible_matches(my_word):
     for string in wordlist:
         if len(string) == len(my_word):
-            if match_with_gaps(my_word,string)==True:
-                print(string)
+            if match_with_gaps(my_word,string):
+                print(string, end=' ')
+
+def print_with_space(word):
+    for char in word:
+        print(char, end=' ')
 
 #Fonction principale du jeu
 
@@ -121,46 +108,57 @@ while new_game==1:
     while guess_word!=secret_word and numbers_of_guess>0:
         print("\nYou have"+str(number_of_warning)+" warning left")
         print("\nYou have "+str(numbers_of_guess)+" guessed left.\n")
-        print("Available letters: "+available_letters)
-        letter_guessed=lowercase(input("\nPlease guess a letter: "))
+        print("Available letters : ", end='')
+        for char in available_letters:
+            print(char, end=' ')
+        letter_guessed=(input("\n\nPlease guess a letter: ")).lower()
         #cette fonction permet de bloquer l'entrée des caractères spéciaux par l'utilisateur
         while (letter_guessed.isalpha() == False):
             if letter_guessed=='*' and number_of_helping>0:
                 number_of_helping-=1
                 print("Possible word matches are: ")
                 show_possible_matches(guess_word)
+                print("\n")
             else:
                 if number_of_warning==0:
                     numbers_of_guess-=1
-                    print("\nOops ! That is not a valid letter. You have "+str(numbers_of_guess)+" guess left. "+guess_word)
+                    print("\nOops ! That is not a valid letter. You have "+str(numbers_of_guess)+" guess left. ",end='')
+                    print_with_space(guess_word)
+                    print("\n")
                 else:
                     number_of_warning-=1
-                    print("\nOops ! That is not a valid letter. You have "+str(number_of_warning)+" warning left. "+guess_word)
-            letter_guessed=lowercase(input("Please guess a letter: "))
+                    print("\nOops ! That is not a valid letter. You have "+str(number_of_warning)+" warning left. ",end='')
+                    print_with_space(guess_word)
+                    print("\n")
+            letter_guessed=(input("Please guess a letter: ")).lower()
     #cette fonction se charge d'emmpêcher la validation d'une réponse contenant plusieurs lettres   
         while len(letter_guessed)!=1:
             if len(letter_guessed)<1:
                 print("You have not entered a letter!!!")
-                letter_guessed=lowercase(input("Please guess a letter: "))
+                letter_guessed=(input("Please guess a letter: ")).lower()
             else:
                 print("Oops, you should enter only 1 letter, not more!!!")
-                letter_guessed=lowercase(input("Please guess a letter: "))
+                letter_guessed=(input("Please guess a letter: ")).lower()
     #cette boucle affiche un message à l'utilisateur si ce dernier entre une lettre qu'il avait déjà entré
     #plus tôt
-        while check_letter(available_letters,letter_guessed)==True:
+        while check_letter(available_letters,letter_guessed):
             if number_of_warning==0:         
                 numbers_of_guess-=1
-                print("\nOops ! You have already guessed this letter. You have "+str(numbers_of_guess)+" guess left. "+guess_word)
+                print("\nOops ! You have already guessed this letter. You have "+str(numbers_of_guess)+" guess left. ",end='')
+                print_with_space(guess_word)
+                print("\n")
             else:
                 number_of_warning-=1
                 print("\nOops ! You have already guessed this letter. You have "+str(number_of_warning)+" warning left. "+guess_word)
-            letter_guessed=lowercase(input("Please guess a letter: "))
+            letter_guessed=(input("Please guess a letter: ")).lower()
         available_letters=get_available_letters(available_letters,letter_guessed)
         if get_guessed_word(secret_word,letter_guessed,guess_word)!=guess_word:
-            print("Good guess: " +get_guessed_word(secret_word, letter_guessed,guess_word))
+            print("Good guess: ", end=' ')
+            print_with_space(get_guessed_word(secret_word, letter_guessed,guess_word))
             print("\n____________")
         else:
-            print("\nOops! That letter is not in a word: " + get_guessed_word(secret_word, letter_guessed,guess_word))
+            print("\nOops! That letter is not in a word: ", end=' ')
+            print_with_space(get_guessed_word(secret_word, letter_guessed,guess_word))
             numbers_of_guess-=1
             print("\n\n____________\n\n")
         guess_word=get_guessed_word(secret_word,letter_guessed,guess_word)
