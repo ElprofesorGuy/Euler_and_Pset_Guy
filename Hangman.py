@@ -7,20 +7,21 @@ play_again=1
 
 
 
-def load_words():
+def load_words(max_lenght_words):
     print("Loading word list from file...")
     inFile = open(WORDLIST_FILENAME, 'r')
     line = inFile.readline()
     wordlist = line.split()
-    print("  ", len(wordlist), "words loaded.")
-    return wordlist
+    wordlist_level=[word for word in wordlist if len(word)<=max_lenght_words]
+    print("  ", len(wordlist_level), "words loaded.")
+    return wordlist_level
 
 
 
 def choose_word(wordlist):
     return random.choice(wordlist)
 
-wordlist = load_words()
+#wordlist = load_words()
 
 
 #A chaque fois que l'utilisateur trouve une lettre du mot secret, cette fonction affiche un mot comportant
@@ -92,13 +93,9 @@ def get_error(letter, available_letters):
     elif letter not in available_letters:
         return "\nYou have already entered this letter!!!"
     
-def hangman(secret_word):
-    number_of_helping=1
-    number_of_guess=6
-    number_of_warning=3
+def hangman(secret_word, number_of_helping, number_of_guess, number_of_warning):
     available_letters=string.ascii_lowercase
     guess_word=''.join(["_"]*len(secret_word))
-    print("Welcome to the game Hangman\n")
     print("I am thinking of a word that is "+str(len(secret_word))+ " letters long\n_ _ _ _ _ _ _")
     while guess_word!=secret_word and number_of_guess>0: #le jeu s'arrête quand le mot secret a été trouvé ou quand number_of_guess tombe à 0
             print("\nYou have "+str(number_of_warning)+" warning left")
@@ -160,14 +157,46 @@ def hangman(secret_word):
             print("\n The correct word is: " + str(secret_word))
 
 if __name__ == '__main__':
+    LEN_WORDS_LEVEL1=5
+    LEN_WORDS_LEVEL2=8
+    LEN_WORDS_LEVEL3=10
+    print("Welcome to the Hangman Game\n\n Please choose the level you want to play!!!")
+    print("1.Easy\n2.Medium\n3.Difficult")
+    choose_level=int(input())
+    while choose_level != 1 and choose_level!=2 and choose_level!=3:
+        print("1.Easy\n2.Medium\n3.Difficult")
+        choose_level=int(input())
     while play_again==1:
-        secret_word=choose_word(wordlist)
-        hangman(secret_word)
+        if choose_level==1:
+            wordlist=load_words(LEN_WORDS_LEVEL1)
+            secret_word=choose_word(wordlist)
+            hangman(secret_word,0,5,2)
+        elif choose_level==2:
+            wordlist=load_words(LEN_WORDS_LEVEL2)
+            secret_word=choose_word(wordlist)
+            hangman(secret_word,0,6,2)
+        elif choose_level==3:
+            wordlist=load_words(LEN_WORDS_LEVEL3)
+            secret_word=choose_word(wordlist)
+            hangman(secret_word,1,5,3)
+        #secret_word=choose_word(wordlist)
+        #hangman(secret_word)
         print("Do you want to play a new game???")
-        print("1. New game")
-        print("2. Exit")
+        print("1. New game\n2. Exit")
         play_again=int(input())
         while play_again != 1 and play_again != 2:
-            print("1. New game")
-            print("2. Exit")
+            print("1. New game\n2. Exit")
             play_again=int(input())
+        print("Do you want to change the level??!\n1. Yes\n2. No")
+        change_level=int(input())
+        while change_level != 1 and change_level != 2:
+            print("\n1. Yes\n2. No")
+            change_level=int(input())
+        if change_level==1:
+            print("1.Easy\n2.Medium\n3.Difficult")
+            choose_level=int(input())
+            while choose_level != 1 and choose_level!=2 and choose_level!=3:
+                print("1.Easy\n2.Medium\n3.Difficult")
+                choose_level=int(input())
+
+
